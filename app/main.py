@@ -34,7 +34,8 @@ def create_app() -> Flask:
         A configured ``Flask`` application instance.
     """
 
-    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), "templates"))
+    app = Flask(__name__, template_folder=os.path.join(
+        os.path.dirname(__file__), "templates"))
 
     # Pull metadata from the environment.  Defaults ensure the app works locally
     # without requiring CI/CD injection.
