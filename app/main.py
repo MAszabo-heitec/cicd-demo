@@ -1,6 +1,7 @@
 """Main module for the Flask application.
 
-This module defines a factory function ``create_app`` which constructs and returns
+This module defines a factory function ``create_app`` 
+which constructs and returns
 a Flask application instance.  The application includes multiple API endpoints
 and a simple web page served via the Jinja2 templating engine.  It uses
 environment variables to expose metadata (commit SHA, version, environment) to
@@ -27,7 +28,8 @@ def create_app() -> Flask:
     - ``/api/random``: Returns a random integer between 0 and 100 inclusive.
     - ``/api/time``: Returns the current UTC timestamp in ISO‑8601 format.
     - ``/api/calc/<int:a>/<int:b>``: Adds two integers and returns the result.
-    - ``/api/info``: Returns a JSON object with version, commit and environment.
+    - ``/api/info``: Returns a JSON object with version, 
+    commit and environment.
     - ``/api/health``: Returns a health check status.
 
     Returns:
@@ -37,7 +39,8 @@ def create_app() -> Flask:
     app = Flask(__name__, template_folder=os.path.join(
         os.path.dirname(__file__), "templates"))
 
-    # Pull metadata from the environment.  Defaults ensure the app works locally
+    # Pull metadata from the environment.  
+    # Defaults ensure the app works locally
     # without requiring CI/CD injection.
     commit_sha = os.environ.get("COMMIT_SHA", "unknown")
     app_version = os.environ.get("APP_VERSION", "0.1.0")
@@ -46,7 +49,8 @@ def create_app() -> Flask:
     @app.route("/")
     def index() -> str:
         """Render the main page with embedded metadata."""
-        return render_template("index.html", commit=commit_sha, version=app_version)
+        return render_template("index.html", 
+                               commit=commit_sha, version=app_version)
 
     @app.route("/api/random")
     def random_api():  # type: ignore[no-untyped-def]
@@ -67,7 +71,8 @@ def create_app() -> Flask:
     @app.route("/api/info")
     def info_api():  # type: ignore[no-untyped-def]
         """Return application metadata."""
-        return jsonify({"version": app_version, "commit": commit_sha, "environment": environment})
+        return jsonify({"version": app_version, 
+                        "commit": commit_sha, "environment": environment})
 
     @app.route("/api/health")
     def health_api():  # type: ignore[no-untyped-def]
