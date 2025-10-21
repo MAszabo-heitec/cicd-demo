@@ -36,6 +36,7 @@ jobs:
             --build-arg ENVIRONMENT=ci \
             -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
     # Upload image as artifact for the next job (optional)
+    
     # - name: Upload image
     #   uses: actions/upload-artifact@v3
     #   with:
