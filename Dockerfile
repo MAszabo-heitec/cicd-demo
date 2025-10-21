@@ -1,6 +1,6 @@
-# Többlépcsős (multi-stage) Docker build a kisebb image-méret és biztonság érdekében.
+# Többlépcsős (multi-stage) Docker build a kisebb image-méret érdekében
 
-# 1. lépés: builder stage – függőségek telepítése
+# Builder stage: telepítsd a függőségeket
 FROM python:3.11-slim AS builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
@@ -9,20 +9,17 @@ COPY requirements.txt .
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# 2. lépés: végső stage – minimal runtime image
+# Final stage: csak a futtatáshoz szükséges komponensek
 FROM python:3.11-slim
 WORKDIR /app
-
-# Másoljuk a telepített Python környezetet a builderből
+# Másold át a builder stage-ből a Python környezetet
 COPY --from=builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
 COPY --from=builder /usr/local/share /usr/local/share
-
-# Alkalmazás kód bemásolása
 COPY app/ ./app/
 
-# Build argumentumok a verzió és környezet beállításához (nem kötelező megadni)
+# Build paraméterek
 ARG APP_VERSION=1.0.0
 ARG ENVIRONMENT=production
 ENV APP_VERSION=$APP_VERSION
@@ -30,5 +27,4 @@ ENV ENVIRONMENT=$ENVIRONMENT
 
 ENV PYTHONUNBUFFERED=1
 EXPOSE 5000
-
 CMD ["python", "app/main.py"]

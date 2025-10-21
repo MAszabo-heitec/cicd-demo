@@ -1,8 +1,3 @@
-"""Initialize the app package.
+"""Initializes the app package and re-exports the factory function."""
 
-This file marks the directory as a Python package so that tests and other modules
-can import `app.main` without encountering a `ModuleNotFoundError`. It does not
-need to contain any code.
-"""
-
-from .main import create_app  # Re-export for convenience
+from .main import create_app  # noqa: F401
