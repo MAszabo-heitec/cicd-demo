@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Complex CI/CD Demo</title>
+    <script>
+      async function loadRandom() {
+        try {
+          const response = await fetch('/api/random');
+          const data = await response.json();
+          document.getElementById('random').innerText = data.random;
+        } catch (error) {
+          console.error('Failed to load random number', error);
+        }
+      }
+      document.addEventListener('DOMContentLoaded', loadRandom);
+    </script>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2rem;
+        line-height: 1.5;
+      }
+      .info {
+        background-color: #f5f5f5;
+        padding: 1rem;
+        border-radius: 4px;
+      }
+      a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Complex CI/CD Demo</h1>
+    <div class="info">
+      <p><strong>Version:</strong> {{ version }}</p>
+      <p><strong>Commit:</strong> {{ commit }}</p>
+      <p>
+        <strong>Random number:</strong>
+        <span id="random">Loading…</span>
+      </p>
+      <p>
+        Ez az oldal bemutatja, hogyan tudunk egy több lépcsős CI/CD folyamatot
+        megvalósítani, amelynek része a statikus GitHub Pages oldal
+        generálása is.  A fenti metadaták és a véletlen szám
+        dinamikusan frissülnek minden új build során.
+      </p>
+    </div>
+    <p>
+      Az alkalmazás metaadatai: <a href="/api/info">/api/info</a>.<br />
+      További végpontok: <a href="/api/time">/api/time</a>,
+      <a href="/api/calc/2/3">/api/calc/2/3</a>.
+    </p>
+    <p>
+      A projekt dokumentációja a
+      <a href="https://github-pages-url.example.com/">GitHub Pages site-on</a>
+      érhető el, ahol a commit hash is megjelenik.
+    </p>
+  </body>
+</html>

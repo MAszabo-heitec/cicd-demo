@@ -1,0 +1,12 @@
+site_name: Complex CI/CD Demo
+site_description: Documentation for the Complex CI/CD Demo application
+site_url: https://example.github.io/complex-ci-cd-demo/
+repo_url: https://github.com/example/complex-ci-cd-demo
+nav:
+  - Home: index.md
+  - About: about.md
+theme:
+  name: readthedocs
+markdown_extensions:
+  - toc:
+      permalink: true

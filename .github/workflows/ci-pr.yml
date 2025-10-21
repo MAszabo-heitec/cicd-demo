@@ -1,23 +1,31 @@
-name: Pull Request CI
+name: PR CI
 
 on:
   pull_request:
-    # Futtassunk bármely branchről érkező PR esetén
-    branches: [ "*" ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
-      - name: Run tests
-        run: pytest
+          pip install flake8
+
+      - name: Lint with flake8
+        run: |
+          flake8 app test
+
+      - name: Run unit tests
+        run: |
+          pytest -q

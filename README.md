@@ -1,31 +1,71 @@
-# Demo: CI/CD pipeline – három GitHub Actions workflow, titkok nélkül
+Complex CI/CD Demo
+===================
 
-Ebben a példában egy minimális Flask alkalmazást találunk a repository gyökerében, kiegészítve három különálló GitHub Actions workflow-val. A cél az, hogy a folyamat futtatásához ne legyen szükség semmilyen felhasználói titokra: minden lépés a GitHub alapértelmezett tokenjeit és környezetét használja. A kód struktúrája és a workflow-k úgy vannak kialakítva, hogy a legtöbb CI/CD funkciót szemléltessék.
+Ez a projekt egy összetettebb Python Flask alkalmazás, amely több API végpontot és egy dinamikus weboldalt valósít meg.  A célja, hogy bemutassa, hogyan lehet egy több lépcsős CI/CD folyamatot felépíteni GitHub Actions segítségével úgy, hogy semmilyen titkos adat (secret) ne legyen szükséges.  A rendszer része továbbá egy statikus dokumentációs oldal, amelyet a `mkdocs` épít és a GitHub Pages szolgáltatás publikál.
 
-## Mappa struktúra
+Fő funkciók
+-----------
 
-- `app/` – a Flask alkalmazás csomagja, benne az `__init__.py` és `main.py` modulokkal.
-- `test/` – pytest tesztek, amelyek ellenőrzik a `/` és `/info` végpontok működését.
-- `requirements.txt` – a projekt Python-függőségei.
-- `Dockerfile` – multi-stage build definíció paraméterezhető build argumentumokkal.
-- `.github/workflows/` – három különálló workflow:
-  - `ci-pr.yml` – PR case: build és tesztek.
-  - `ci-dev.yml` – fejlesztői ágon (dev) build, tesztek és pip-audit.
-  - `ci-main.yml` – főág (main) build, tesztek, bandit security scan és image artefakt.
+- **Webfelület**: a gyökér (`/`) útvonal egy HTML oldalt ad vissza, ahol megjelenik az alkalmazás verziója, a commit SHA és egy véletlen szám, amelyet az API-ból tölt be JavaScripttel.
+- **API végpontok**:
+  - `GET /api/random`: egy 0 és 100 közötti véletlen számot ad vissza.
+  - `GET /api/time`: az aktuális UTC időt ISO‑8601 formátumban adja vissza.
+  - `GET /api/calc/<a>/<b>`: összeadja az `a` és `b` paramétereket és JSON-ben küldi vissza.
+  - `GET /api/info`: metaadatokat ad vissza (`version`, `commit`, `environment`).
+  - `GET /api/health`: az alkalmazás egészségi állapotát jelzi.
+- **Dinamikus commit megjelenítés**: a commit SHA és a verzió környezeti változókon keresztül kerül az oldalba, ezáltal minden újabb `push` láthatóan frissíti a weboldalt és a dokumentációt is.
+- **Docker**: a multi‑stage Dockerfile hatékonyan építi fel az alkalmazást egy vékony runtime image‑be.
+- **Dokumentáció**: a projekt tartalmaz egy `docs` mappát és `mkdocs.yml` konfigurációt.  A GitHub Actions a `main` branche‑re történő push alkalmával építi a statikus weboldalt a commit SHA beszúrásával, majd publikálja azt GitHub Pages‑en.
 
-## Workflow-k röviden
+Mappastruktúra
+--------------
 
-1. **ci-pr.yml** – fut, amikor pull request nyílik bármelyik branchről. Telepíti a Python környezetet, a függőségeket, majd futtatja a teszteket. Ha valamelyik teszt elbukik, a PR nem mergelhető.
+    demo_cicd_complex/
+    ├── app/                 # Flask alkalmazás
+    │   ├── __init__.py
+    │   ├── main.py
+    │   └── templates/
+    │       └── index.html
+    ├── docs/                # mkdocs tartalom
+    │   ├── index.md
+    │   └── about.md
+    ├── test/
+    │   └── test_app.py      # unit tesztek
+    ├── .github/workflows/   # GitHub Actions workflow definíciók
+    │   ├── ci-pr.yml
+    │   ├── ci-dev.yml
+    │   └── ci-main.yml
+    ├── Dockerfile           # többfázisú build
+    ├── requirements.txt     # futásidejű függőségek
+    └── mkdocs.yml           # mkdocs konfiguráció
 
-2. **ci-dev.yml** – a `dev` branchre érkező push esetén aktiválódik. A workflow telepíti a függőségeket, futtatja a pytest-et, majd a `pip-audit` eszközzel ellenőrzi a `requirements.txt` sebezhetőségeit, és buildeli a Docker image-et `dev` taggel.
+Lokális futtatás
+---------------
 
-3. **ci-main.yml** – a `main` branchre történő pushra reagál. A workflow unit teszteket futtat, majd a `bandit` statikus kódanalízist végzi az `app/` könyvtáron. Ezután buildeli a Docker image-et, fájlba menti (`docker save`) és a GitHub Actions felületén artefaktként elmenti, letölthetővé téve a build eredményét.
+1. Telepítsd a Python függőségeket:
 
-## Használat
+        python -m pip install -r requirements.txt
 
-1. Hozd létre a GitHub repository-t a mappa tartalmával (a gyökérben található mappák és fájlok kerüljenek a repó gyökerébe).
-2. Nyiss egy pull requestet – a `ci-pr` workflow lefut és teszteli a kódot.
-3. Pusholj a `dev` branchre – a `ci-dev` workflow lefut, auditot és buildet végez.
-4. Pusholj a `main` branchre – a `ci-main` workflow lefut, security scan-t és release buildet készít.
+2. Indítsd el az alkalmazást:
 
-Semmilyen titok vagy egyéni token megadására nincs szükség; a workflow-k a GitHub által biztosított környezetet használják.
+        python -m app.main
+
+3. Nyisd meg a böngészőben: [http://localhost:5000](http://localhost:5000).
+
+Tesztelés
+---------
+
+Futtasd az egységteszteket a következő paranccsal:
+
+        pytest -q
+
+CI/CD áttekintés
+----------------
+
+Három különálló GitHub Actions workflow szolgálja a minőségbiztosítást és a build/deploy folyamatokat:
+
+1. **PR CI (`ci-pr.yml`)**: Minden pull request nyitásakor vagy frissítésekor fut.  Egységteszteket és kódban futtatott statikus analízist (flake8) végez, így már az egyes PR-eknél kiszűri a hibákat.
+2. **Dev Build & Audit (`ci-dev.yml`)**: A `dev` branch-re érkező pusht indítja.  Futnak a tesztek, a `pip-audit` függőség ellenőrzés, a `flake8` lint és a Docker image építése is.  Így a fejlesztői ágon már korán kiderülnek a problémák.
+3. **Main Release & Pages (`ci-main.yml`)**: A `main` ágra történő push esetén fut.  Teszteket és statikus elemzéseket futtat (`flake8`, `bandit`), megépíti a Docker image‑et, majd `mkdocs` segítségével statikus oldalt generál a `docs` mappából, beleírja a friss commit SHA‑t, feltölti egy artefaktként és a végén a GitHub Pages szolgáltatásra publikálja.  Ez a GitHub Pages site mindig a `main` branch legutóbbi commitját jeleníti meg.
+
+Ezek a folyamatok secretek nélkül működnek: a GitHub által biztosított token és runner környezet elegendő a buildhez és a Pages deployhoz.

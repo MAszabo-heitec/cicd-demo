@@ -1,30 +1,31 @@
-# Többlépcsős (multi-stage) Docker build a kisebb image-méret érdekében
+# syntax=docker/dockerfile:1
 
-# Builder stage: telepítsd a függőségeket
+# Build stage: install dependencies into a minimal image
 FROM python:3.11-slim AS builder
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
 
-# Final stage: csak a futtatáshoz szükséges komponensek
-FROM python:3.11-slim
 WORKDIR /app
-# Másold át a builder stage-ből a Python környezetet
-COPY --from=builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /usr/local/include /usr/local/include
-COPY --from=builder /usr/local/share /usr/local/share
+
+COPY requirements.txt ./
+RUN python -m pip install --user --no-cache-dir -r requirements.txt
+
+# Final stage: copy only what we need
+FROM python:3.11-slim
+
+LABEL org.opencontainers.image.title="Complex CI/CD Demo"
+LABEL org.opencontainers.image.source="https://github.com/<USER>/<REPO>"
+
+WORKDIR /app
+
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Copy installed dependencies from builder
+COPY --from=builder /root/.local /root/.local
+
+# Copy application code
 COPY app/ ./app/
 
-# Build paraméterek
-ARG APP_VERSION=1.0.0
-ARG ENVIRONMENT=production
-ENV APP_VERSION=$APP_VERSION
-ENV ENVIRONMENT=$ENVIRONMENT
-
-ENV PYTHONUNBUFFERED=1
 EXPOSE 5000
-CMD ["python", "app/main.py"]
+
+ENV PORT=5000
+
+CMD ["python", "-m", "app.main"]
