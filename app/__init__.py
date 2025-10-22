@@ -1,6 +1,6 @@
 """Package initialization for the Flask application.
 
-Exposes the `create_app` factory for 
+Exposes the `create_app` factory for
 use by external tools and the command line.
 """
 
