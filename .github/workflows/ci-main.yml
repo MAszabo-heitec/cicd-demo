@@ -1,4 +1,4 @@
-name: Main Release & Pages
+name: Main Release & GitHub Pages
 
 on:
   push:
