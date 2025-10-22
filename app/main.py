@@ -78,7 +78,7 @@ def create_app() -> Flask:
     def health_api():  # type: ignore[no-untyped-def]
         """Health check endpoint."""
         return jsonify({"status": "ok"})
-    #asd
+    # asd
     return app
 
 
