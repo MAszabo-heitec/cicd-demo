@@ -65,7 +65,8 @@ def create_app() -> Flask:
 
     @app.route("/api/calc/<int:a>/<int:b>")
     def calc_api(a: int, b: int):  # type: ignore[no-untyped-def]
-        """Add two integers and return the result."""
+        """Add two integers and return the
+        result."""
         return jsonify({"result": a + b})
 
     @app.route("/api/info")
