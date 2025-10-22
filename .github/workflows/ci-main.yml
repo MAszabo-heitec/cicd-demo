@@ -48,7 +48,6 @@ jobs:
 
       - name: Inject commit SHA into docs
         run: |
-          # Replace placeholder with current commit SHA in docs
           sed -i "s/{{COMMIT_SHA}}/${{ github.sha }}/g" docs/index.md
 
       - name: Build static site
