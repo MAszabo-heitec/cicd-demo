@@ -36,4 +36,4 @@ Then navigate to [http://localhost:5000](http://localhost:5000) in your browser.
 
 ## Workflow Summary
 
-For details on the CI/CD process and the different workflows that power this project, see [About](/about/). These workflows ensure code quality with tests and static analysis, build Docker images, audit dependencies, and publish this documentation using GitHub Pages — all without requiring any secrets.
+For details on the CI/CD process and the different workflows that power this project, see [About](about.md). These workflows ensure code quality with tests and static analysis, build Docker images, audit dependencies, and publish this documentation using GitHub Pages — all without requiring any secrets.

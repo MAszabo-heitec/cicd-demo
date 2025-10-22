@@ -46,4 +46,4 @@ Because this workflow builds the documentation on every push to `main` and injec
 * The **`docs/`** directory contains the content for the GitHub Pages site.  The `mkdocs.yml` file configures navigation and theme.
 * **Unit tests** reside in the `test/` directory.  They use Flask's test client to call endpoints without requiring a running server.
 
-For more information on how to run the project locally or details about the API, consult the [README](../README.md) in the repository root.
+For more information on how to run the project locally or details about the API, consult the [home page](index.md) in the repository root.
